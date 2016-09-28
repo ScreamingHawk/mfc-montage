@@ -5,15 +5,6 @@ Montage downloads images from myfigurecollection using a users list and then
 generates a pretty montage using ImageMagick with a commandline call. 
 """
 
-__author__ = "Michael Standen"
-__copyright__ = "Copyright 2016, Michael Standen"
-__credits__ = ["Michael Standen"]
-__license__ = "MIT"
-__version__ = "1.0.0"
-__maintainer__ = "Michael Standen"
-__email__ = "michael@standen.link"
-__status__ = "Production"
-
 from . import helper
 
 import os

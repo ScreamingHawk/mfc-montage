@@ -5,15 +5,6 @@ Helper contains methods to download collection images, get JSON responses from
 API calls, maps status codes to words. 
 """
 
-__author__ = "Michael Standen"
-__copyright__ = "Copyright 2016, Michael Standen"
-__credits__ = ["Michael Standen"]
-__license__ = "MIT"
-__version__ = "1.0.0"
-__maintainer__ = "Michael Standen"
-__email__ = "michael@standen.link"
-__status__ = "Production"
-
 import urllib.request
 import json
 import sys
