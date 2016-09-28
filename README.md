@@ -11,10 +11,10 @@ A Python 3.5.x package for generating images using a user's lists on MyFigureCol
 1. Download and Install [Python 3.5.x](https://www.python.org/downloads/). 
 2. Download [ImageMagick](http://www.imagemagick.org/script/binary-releases.php). Be sure to add ImageMagick to your PATH. 
 3. Download [MFC Montage](https://github.com/ScreamingHawk/mfc-montage). 
-4. Then use it!:
-* Import it for your own use (as in [example.py](https://github.com/ScreamingHawk/mfc-montage/blob/master/example.py))
-* Run the [example](https://github.com/ScreamingHawk/mfc-montage/blob/master/example.py)
-* Run [montage.py](https://github.com/ScreamingHawk/mfc-montage/blob/master/mfcmontage/montage.py) directly for a command line interface
+4. Then use it!
+  * Import it for your own use (as in [example.py](https://github.com/ScreamingHawk/mfc-montage/blob/master/example.py))
+  * Run the [example](https://github.com/ScreamingHawk/mfc-montage/blob/master/example.py)
+  * Run [montage.py](https://github.com/ScreamingHawk/mfc-montage/blob/master/mfcmontage/montage.py) directly for a command line interface
 
 ## Credits
 [Michael Standen](http://michael.standen.link)
