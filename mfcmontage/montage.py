@@ -25,7 +25,8 @@ def generateMontage(username, statusWord, title=True):
     """Generates a pretty montage with the saved images. """
     magickCmd = 'magick montage * '
     magickCmd += montageFlags.format(*montageFlagArgs)
-    magickCmd += ' -title "{}"'.format(statusWord.title())
+    if title:
+        magickCmd += ' -title "{}"'.format(statusWord.title())
     magickCmd += ' ../{}_{}.jpg'.format(username, statusWord)
 
     print('Magick command: {}'.format(magickCmd))
