@@ -49,9 +49,9 @@ def montageStatus(username, status):
     """Generates a montage for the given user and status. """
     statusWord = helper.getStatusWord(status)
     
-    print('Getting {} list. '.format(statusWord))
+    helper.console('Getting {} list. '.format(statusWord))
     items = helper.getCollection(username, status, 1, [])
-    print('Collection size: {}'.format(len(items)))
+    helper.console('Collection size: {}'.format(len(items)))
 
     helper.createImageFolder()
 

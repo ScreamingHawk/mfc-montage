@@ -26,7 +26,8 @@ def montageWished(username):
     helper.createImageFolder()
     montage.resetMontageFlags()
     montage.montageFlags += ' -tile x1'
-    magickCmd = 'convert'
+    magickCmd = 'convert '
+    wishabilityFilenames = []
     for wishability in reversed(range(1, 6)):
         wishabilityAdded = False
         helper.clearImageFolder()
@@ -36,14 +37,19 @@ def montageWished(username):
                     e.submit(helper.saveItemImage(item))
                     wishabilityAdded = True
         if wishabilityAdded:
-            magickCmd += ' {}_{}.jpg'.format(username, wishability)
+            wishabilityFilenames.append('{}_{}.jpg'.format(\
+                username, wishability))
             montage.generateMontage(username, wishability)
 
     # Join the seperate wishability images
-    magickCmd += ' -gravity center -append {}_wished.jpg'.format(username)
+    magickCmd += '{} -gravity center -append {}_wished.jpg'\
+                 .format(" ".join(wishabilityFilenames), username)
     helper.callMagick(magickCmd, cd=False)
-    
+
+    # Clean up
     helper.deleteImageFolder()
+    for filename in wishabilityFilenames:
+        helper.deleteFile(filename)
         
 
 if __name__ == '__main__':

@@ -17,13 +17,20 @@ mfc_base = 'http://myfigurecollection.net/api.php?type=json'
 mfc_img_base = 'http://s1.tsuki-board.net/pics/figure/big/'
 imageFolder = 'img'
 
+def console(out):
+    """Catches unicode errors when printing. """
+    try:
+        print(out)
+    except UnicodeEncodeError:
+        print(re.sub(r'([^\s\w]|_)+', '', out))
+
 def getResponse(url):
     """A helper method for getting a JSON response. """
     response = urllib.request.urlopen(url)
     data = response.read().decode('utf-8')
     resp = json.loads(data)
     if 'error' in resp:
-        print('Error: {}'.format(resp['error']['msg']))
+        console('Error: {}'.format(resp['error']['msg']))
         input('Press Enter to Close')
         sys.exit()
     return resp
@@ -49,7 +56,7 @@ def getStatusCode(statusWord):
 
 def getCollection(username, status, page, items):
     """Returns all items in a users list. """
-    print('Getting page: {}'.format(page))
+    console('Getting page: {}'.format(page))
     resp = getResponse('{}&mode=collection&username={}&status={}&page={}'\
                        .format(mfc_base, username, status, page))
 
@@ -59,7 +66,10 @@ def getCollection(username, status, page, items):
 
         for item in coll['item']:
             items.append(item)
-            print(item['data']['name'])
+            try:
+                console(item['data']['name'])
+            except UnicodeEncodeError:
+                print(re.sub(r'([^\s\w]|_)+', '', item['data']['name']))
     except KeyError:
         # Nothing in this page
         return items
@@ -72,7 +82,7 @@ def getCollection(username, status, page, items):
 def saveItemImage(item):
     """Saves the image for the item to disk. """
     itemName = item['data']['name']
-    print('Getting image for: {}'.format(itemName))
+    console('Getting image for: {}'.format(itemName))
     fullImgUrl = '{}{}.jpg'.format(mfc_img_base, item['data']['id'])
     req = urllib.request.Request(fullImgUrl, \
                                  headers={'User-Agent' : "Magic Browser"})
@@ -113,13 +123,19 @@ def deleteImageFolder(pause=5):
 
 
 def callMagick(magickCmd, pause=1, cd=True):
-    print('Magick command: {}'.format(magickCmd))
+    console('Magick command: {}'.format(magickCmd))
     cmd = ''
     if cd:
         cmd = 'cd {} && '.format(imageFolder)
     os.system('{}magick {}'.format(cmd, magickCmd))
     time.sleep(pause)
-    
+
+
+def deleteFile(filename, cd=False):
+    cmd = ''
+    if cd:
+        cmd = 'cd {} && '.format(imageFolder)
+    os.system('{}del {}'.format(cmd, filename))
     
     
 if __name__ == '__main__':
