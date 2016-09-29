@@ -4,6 +4,7 @@ A Python 3.5.x package for generating images using a user's lists on MyFigureCol
 ## Features
 * Download images of all figures in your wished, ordered, and owned lists. 
 * Generate a pretty montage of the figures in your list. 
+* Generate a montage of your wished list in order of wishability. 
 * Packaged for easy use in other python applications. 
 * Simple command line interface included for basic use. 
 
@@ -15,6 +16,7 @@ A Python 3.5.x package for generating images using a user's lists on MyFigureCol
   * Import it for your own use (as in [example.py](https://github.com/ScreamingHawk/mfc-montage/blob/master/example.py))
   * Run the [example](https://github.com/ScreamingHawk/mfc-montage/blob/master/example.py)
   * Run [montage.py](https://github.com/ScreamingHawk/mfc-montage/blob/master/mfcmontage/montage.py) directly for a command line interface
+  * Run [wished.py](https://github.com/ScreamingHawk/mfc-montage/blob/master/mfcmontage/wished.py) directly for a montage sorted by wishability
 
 ## Credits
 [Michael Standen](http://michael.standen.link)
