@@ -1,4 +1,7 @@
-from mfcmontage import montage, helper
+from mfcmontage import helper, montage, wished
+
+username = 'MilkyTaste'
 
 statusCode = helper.getStatusCode('owned')
-montage.montageStatus('MilkyTaste', statusCode)
+montage.montageStatus(username, statusCode)
+wished.montageWished(username)
