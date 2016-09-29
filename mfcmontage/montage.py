@@ -5,21 +5,27 @@ Montage downloads images from myfigurecollection using a users list and then
 generates a pretty montage using ImageMagick with a commandline call. 
 """
 
-from . import helper
+try:
+    from . import helper
+except SystemError:
+    import helper
 
 import os
 import concurrent.futures
 
 montage_image_size_w = 256
 montage_image_size_h = 256
+montage_background = 'white'
 
-def generateMontage(username, statusWord):
+montageFlags = '-shadow -geometry "{}x{}+1+1>" -background {}'
+montageFlagArgs = [montage_image_size_w, montage_image_size_h, \
+                   montage_background]
+
+def generateMontage(username, statusWord, title=True):
     """Generates a pretty montage with the saved images. """
-    magickCmd = 'magick montage *'
-    magickCmd += ' -shadow'
-    magickCmd += ' -geometry "{}x{}+1+1>"'.format(montage_image_size_w, \
-                                                  montage_image_size_h)
-    magickCmd += ' -background {}'.format('white')
+    magickCmd = 'magick montage * '
+    magickCmd += montageFlags.format(*montageFlagArgs)
+    magickCmd += ' -title "{}"'.format(statusWord.title())
     magickCmd += ' ../{}_{}.jpg'.format(username, statusWord)
 
     print('Magick command: {}'.format(magickCmd))
