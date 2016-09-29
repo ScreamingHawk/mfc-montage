@@ -89,13 +89,18 @@ def createImageFolder():
         os.makedirs(imageFolder)
     except FileExistsError:
         # Exists, delete contents instead
-        filelist = [f for f in os.listdir(imageFolder)]
-        for f in filelist:
-            os.remove('{}/{}'.format(imageFolder, f))
+        clearImageFolder()
 
+
+def clearImageFolder():
+    """Clears the contents of the image folder. """
+    filelist = [f for f in os.listdir(imageFolder)]
+    for f in filelist:
+        os.remove('{}/{}'.format(imageFolder, f))
+            
 
 def deleteImageFolder():
-    """Clears the image folder. """
+    """Deletes the image folder. """
     try:
         shutil.rmtree(imageFolder)
     except PermissionError:
