@@ -108,6 +108,11 @@ def deleteImageFolder():
         time.sleep(5)
         shutil.rmtree(imageFolder)
 
+
+def callMagick(magickCmd):
+    print('Magick command: {}'.format(magickCmd))
+    os.system('cd {} && {}'.format(imageFolder, magickCmd))
+    
     
 if __name__ == '__main__':
     # Do nothing

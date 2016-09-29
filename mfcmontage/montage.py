@@ -6,8 +6,10 @@ generates a pretty montage using ImageMagick with a commandline call.
 """
 
 try:
+    # Module import
     from . import helper
 except SystemError:
+    # Local import
     import helper
 
 import os
@@ -17,21 +19,29 @@ montage_image_size_w = 256
 montage_image_size_h = 256
 montage_background = 'white'
 
-montageFlags = '-shadow -geometry "{}x{}+1+1>" -background {}'
-montageFlagArgs = [montage_image_size_w, montage_image_size_h, \
+montageFlags = None
+montageFlagArgs = None
+
+def resetMontageFlags():
+    global montageFlags
+    global montageFlagArgs
+    montageFlags = '-shadow -geometry "{}x{}+1+1>" -background {}'
+    montageFlagArgs = [montage_image_size_w, montage_image_size_h, \
                    montage_background]
 
-def generateMontage(username, statusWord, title=True):
+# Init the flags
+resetMontageFlags()
+
+def generateMontage(username, statusWord, title=True, overrideFilename=False):
     """Generates a pretty montage with the saved images. """
     magickCmd = 'magick montage * '
     magickCmd += montageFlags.format(*montageFlagArgs)
     if title:
         magickCmd += ' -title "{}"'.format(statusWord.title())
-    magickCmd += ' ../{}_{}.jpg'.format(username, statusWord)
+    if not overrideFilename:
+        magickCmd += ' ../{}_{}.jpg'.format(username, statusWord)
 
-    print('Magick command: {}'.format(magickCmd))
-    
-    os.system('cd {} && {}'.format(helper.imageFolder, magickCmd))
+    helper.callMagick(magickCmd)
 
 
 def montageStatus(username, status):
