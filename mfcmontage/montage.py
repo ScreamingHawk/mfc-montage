@@ -32,16 +32,17 @@ def resetMontageFlags():
 # Init the flags
 resetMontageFlags()
 
-def generateMontage(username, statusWord, title=True, overrideFilename=False):
+def generateMontage(username, statusWord, title=True, \
+                    overrideFilename=False, pause=0):
     """Generates a pretty montage with the saved images. """
-    magickCmd = 'magick montage * '
+    magickCmd = 'montage * '
     magickCmd += montageFlags.format(*montageFlagArgs)
     if title:
-        magickCmd += ' -title "{}"'.format(statusWord.title())
+        magickCmd += ' -title "{}"'.format(str(statusWord).title())
     if not overrideFilename:
         magickCmd += ' ../{}_{}.jpg'.format(username, statusWord)
 
-    helper.callMagick(magickCmd)
+    helper.callMagick(magickCmd, pause=pause)
 
 
 def montageStatus(username, status):

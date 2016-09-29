@@ -99,19 +99,27 @@ def clearImageFolder():
         os.remove('{}/{}'.format(imageFolder, f))
             
 
-def deleteImageFolder():
+def deleteImageFolder(pause=5):
     """Deletes the image folder. """
     try:
         shutil.rmtree(imageFolder)
     except PermissionError:
-        #Still busy creating the montage or something. Try once more
-        time.sleep(5)
+        # Still busy creating the montage or something. Try once more
+        time.sleep(pause)
         shutil.rmtree(imageFolder)
+    except FileNotFoundError:
+        # Folder already gone
+        pass
 
 
-def callMagick(magickCmd):
+def callMagick(magickCmd, pause=1, cd=True):
     print('Magick command: {}'.format(magickCmd))
-    os.system('cd {} && {}'.format(imageFolder, magickCmd))
+    cmd = ''
+    if cd:
+        cmd = 'cd {} && '.format(imageFolder)
+    os.system('{}magick {}'.format(cmd, magickCmd))
+    time.sleep(pause)
+    
     
     
 if __name__ == '__main__':
