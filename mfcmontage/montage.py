@@ -57,6 +57,21 @@ def generateMontage(username, statusWord, title=True, \
     helper.callMagick(magickCmd, pause=pause)
 
 
+def generateMontageStrip(username, statusWord, title=False, \
+                         overrideFilename=False, pause=0):
+    """Generates a strip formatted montage using saved images. """
+    global montage_image_size_w
+    global montage_image_size_h
+    montage_image_size_w = 100
+    montage_image_size_h = 300
+    resetMontageFlags()
+    preProcessMontage()
+    global montageFlags
+    montageFlags += ' -tile x1'
+    generateMontage(username, statusWord, title=title, \
+                    overrideFilename=overrideFilename, pause=pause)
+
+
 def montageStatus(username, status, strip=False):
     """Generates a montage for the given user and status. """
     statusWord = helper.getStatusWord(status)
@@ -65,24 +80,20 @@ def montageStatus(username, status, strip=False):
     items = helper.getCollection(username, status, 1, [])
     helper.console('Collection size: {}'.format(len(items)))
 
-    helper.createImageFolder()
+    if len(items) == 0:
+        helper.console('Nothing to generate. ')
+    else:
+        helper.createImageFolder()
 
-    # Get images
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as e:
-        for item in items:
-            e.submit(helper.saveItemImage(item))
+        # Get images
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as e:
+            for item in items:
+                e.submit(helper.saveItemImage(item))
 
-    if strip:
-        global montage_image_size_w
-        global montage_image_size_h
-        montage_image_size_w = 100
-        montage_image_size_h = 300
-        resetMontageFlags()
-        preProcessMontage()
-        global montageFlags
-        montageFlags += ' -tile x1'
-        
-    generateMontage(username, statusWord, title=(not strip))
+        if strip:
+            generateMontageStrip(username, statusWord)
+        else:
+            generateMontage(username, statusWord)
 
 
 if __name__ == '__main__':
@@ -90,13 +101,14 @@ if __name__ == '__main__':
     username = str(input('MFC Username: '))
     status = str(input(\
         'Wished (0), Ordered (1), Owned (2) or All (<blank>): '))
+    strip = str(input('Strip format (y/N): ')).lower() == 'y'
 
     # Do montage
     if status == '':
         for status in range(0, 3):
-            montageStatus(username, status)
+            montageStatus(username, status, strip=strip)
     else:
-        montageStatus(username, status, strip=True)
+        montageStatus(username, status, strip=strip)
 
     helper.deleteImageFolder()
 
