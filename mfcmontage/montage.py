@@ -50,7 +50,8 @@ def generateMontage(username, statusWord, title=True, \
     magickCmd = 'montage * '
     magickCmd += montageFlags.format(*montageFlagArgs)
     if title:
-        magickCmd += ' -title "{}"'.format(str(statusWord).title())
+        magickCmd += ' -title "{}\'s {}"'.format(username, \
+                                                str(statusWord).title())
     if not overrideFilename:
         magickCmd += ' ../{}_{}.jpg'.format(username, statusWord)
 
