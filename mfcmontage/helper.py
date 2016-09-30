@@ -66,10 +66,7 @@ def getCollection(username, status, page, items):
 
         for item in coll['item']:
             items.append(item)
-            try:
-                console(item['data']['name'])
-            except UnicodeEncodeError:
-                print(re.sub(r'([^\s\w]|_)+', '', item['data']['name']))
+            console(item['data']['name'])
     except KeyError:
         # Nothing in this page
         return items
