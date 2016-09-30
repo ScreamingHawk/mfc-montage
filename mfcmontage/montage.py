@@ -18,6 +18,7 @@ import concurrent.futures
 montage_image_size_w = 256
 montage_image_size_h = 256
 montage_background = 'white'
+montage_strip_bordercolor = 'grey'
 
 montageFlags = None
 montageFlagArgs = None
@@ -32,6 +33,17 @@ def resetMontageFlags():
 # Init the flags
 resetMontageFlags()
 
+def preProcessMontage():
+    """Resizes all images in image folder. """
+    magickCmd = 'mogrify -resize "{}x{}^" -gravity center '+\
+                '-crop {}x{}+0+0 +repage -bordercolor {} -border 1 *'
+    helper.callMagick(magickCmd.format(montage_image_size_w, \
+                                       montage_image_size_h, \
+                                       montage_image_size_w, \
+                                       montage_image_size_h, \
+                                       montage_strip_bordercolor))    
+        
+
 def generateMontage(username, statusWord, title=True, \
                     overrideFilename=False, pause=0):
     """Generates a pretty montage with the saved images. """
@@ -45,7 +57,7 @@ def generateMontage(username, statusWord, title=True, \
     helper.callMagick(magickCmd, pause=pause)
 
 
-def montageStatus(username, status):
+def montageStatus(username, status, strip=False):
     """Generates a montage for the given user and status. """
     statusWord = helper.getStatusWord(status)
     
@@ -60,7 +72,17 @@ def montageStatus(username, status):
         for item in items:
             e.submit(helper.saveItemImage(item))
 
-    generateMontage(username, statusWord)
+    if strip:
+        global montage_image_size_w
+        global montage_image_size_h
+        montage_image_size_w = 100
+        montage_image_size_h = 300
+        resetMontageFlags()
+        preProcessMontage()
+        global montageFlags
+        montageFlags += ' -tile x1'
+        
+    generateMontage(username, statusWord, title=(not strip))
 
 
 if __name__ == '__main__':
@@ -74,7 +96,7 @@ if __name__ == '__main__':
         for status in range(0, 3):
             montageStatus(username, status)
     else:
-        montageStatus(username, status)
+        montageStatus(username, status, strip=True)
 
     helper.deleteImageFolder()
 

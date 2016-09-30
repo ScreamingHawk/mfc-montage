@@ -93,6 +93,11 @@ def saveItemImage(item):
         shutil.copyfileobj(response, fout)
 
 
+def listImageFolder():
+    """Returns a list of all filenames in the image folder. """
+    return [f for f in os.listdir(imageFolder)]
+
+
 def createImageFolder():
     """Creates or empties the image folder. """
     try:
@@ -104,7 +109,7 @@ def createImageFolder():
 
 def clearImageFolder():
     """Clears the contents of the image folder. """
-    filelist = [f for f in os.listdir(imageFolder)]
+    filelist = listImageFolder()
     for f in filelist:
         os.remove('{}/{}'.format(imageFolder, f))
             
