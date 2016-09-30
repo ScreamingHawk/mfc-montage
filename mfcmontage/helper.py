@@ -54,7 +54,7 @@ def getStatusCode(statusWord):
         return -1
 
 
-def getCollection(username, status, page, items):
+def getCollection(username, status, page, items, figuresOnly=True, prepaintedOnly=True):
     """Returns all items in a users list. """
     console('Getting page: {}'.format(page))
     resp = getResponse('{}&mode=collection&username={}&status={}&page={}'\
@@ -65,8 +65,11 @@ def getCollection(username, status, page, items):
         coll = resp['collection'][getStatusWord(status)]
 
         for item in coll['item']:
-            items.append(item)
-            console(item['data']['name'])
+            if (not figuresOnly or item['root']['name'] == 'Figures') and \
+               (not prepaintedOnly or \
+                item['category']['name'] == 'Prepainted'):
+                items.append(item)
+                console(item['data']['name'])
     except KeyError:
         # Nothing in this page
         return items
