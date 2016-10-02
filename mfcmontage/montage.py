@@ -59,21 +59,33 @@ def generateMontage(username, statusWord, title=True, \
 
 
 def generateMontageStrip(username, statusWord, title=False, \
-                         overrideFilename=False, pause=0):
+                         overrideFilename=False, pause=0, vertical=True):
     """Generates a strip formatted montage using saved images. """
     global montage_image_size_w
     global montage_image_size_h
-    montage_image_size_w = 100
-    montage_image_size_h = 300
-    resetMontageFlags()
-    preProcessMontage()
     global montageFlags
-    montageFlags += ' -tile x1'
+    if vertical:
+        montage_image_size_w = 300
+        montage_image_size_h = 100
+        resetMontageFlags()
+        montageFlags += ' -tile 1x'
+    else:
+        montage_image_size_w = 100
+        montage_image_size_h = 300
+        resetMontageFlags()
+        montageFlags += ' -tile x1'
+    preProcessMontage()
     generateMontage(username, statusWord, title=title, \
                     overrideFilename=overrideFilename, pause=pause)
 
 
-def montageStatus(username, status, strip=False):
+def generateMontagePantsu(username, statusWord, title=False, \
+                          overrideFilename=False, pause=0):
+    """Generates a strip formatted montage using saved images, in vertical. """
+    generateMontageStrip(username, statusWord, title, overrideFilename, \
+                         pause, True)
+
+def montageStatus(username, status, strip=False, vertical=False):
     """Generates a montage for the given user and status. """
     statusWord = helper.getStatusWord(status)
     
@@ -92,7 +104,10 @@ def montageStatus(username, status, strip=False):
                 e.submit(helper.saveItemImage(item))
 
         if strip:
-            generateMontageStrip(username, statusWord)
+            if vertical:
+                generateMontagePantsu(username, statusWord)
+            else:
+                generateMontageStrip(username, statusWord)
         else:
             generateMontage(username, statusWord)
 
@@ -103,13 +118,15 @@ if __name__ == '__main__':
     status = str(input(\
         'Wished (0), Ordered (1), Owned (2) or All (<blank>): '))
     strip = str(input('Strip format (y/N): ')).lower() == 'y'
+    if strip:
+        vert = str(input('Pantsu format (y/N): ')).lower() == 'y'
 
     # Do montage
     if status == '':
         for status in range(0, 3):
-            montageStatus(username, status, strip=strip)
+            montageStatus(username, status, strip=strip, vertical=vert)
     else:
-        montageStatus(username, status, strip=strip)
+        montageStatus(username, status, strip=strip, vertical=vert)
 
     helper.deleteImageFolder()
 
