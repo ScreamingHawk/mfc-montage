@@ -12,13 +12,18 @@ import os
 import shutil
 import time
 import re
+import logging
 
 mfc_base = 'http://myfigurecollection.net/api.php?type=json'
 mfc_img_base = 'http://s1.tsuki-board.net/pics/figure/big/'
 imageFolder = 'img'
 
+LOG_FILENAME = 'debug.log'
+logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG)
+
 def console(out):
-    """Catches unicode errors when printing. """
+    """Logs to file and catches unicode errors when printing. """
+    logging.debug(out)
     try:
         print(out)
     except UnicodeEncodeError:
