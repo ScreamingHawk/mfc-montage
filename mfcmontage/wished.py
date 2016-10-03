@@ -7,10 +7,10 @@ Useful as a way to showcase which items you most desire.
 
 try:
     # Module import
-    from . import montage, helper
+    from . import montage, helper, image_config
 except SystemError:
     # Local import
-    import montage, helper
+    import montage, helper, image_config
 
 import os
 import concurrent.futures
@@ -24,8 +24,10 @@ def montageWished(username):
 
     # Get images for each wishability
     helper.createImageFolder()
-    montage.resetMontageFlags()
-    montage.montageFlags += ' -tile x1'
+    config = image_config.createUserStatusConfig(username, statusWord)
+    config.setTile('x1')
+    config.setGeometry("{}x{}+1+1>".format(\
+        config.image_width, config.image_height))
     magickCmd = 'convert '
     wishabilityFilenames = []
     for wishability in reversed(range(1, 6)):
@@ -37,9 +39,11 @@ def montageWished(username):
                     e.submit(helper.saveItemImage(item))
                     wishabilityAdded = True
         if wishabilityAdded:
-            wishabilityFilenames.append('{}_{}.jpg'.format(\
-                username, wishability))
-            montage.generateMontage(username, wishability)
+            wfilename = '{}_{}.jpg'.format(username, wishability)
+            wishabilityFilenames.append(wfilename)
+            config.setFilename(wfilename)
+            config.setTitle('{}\'s {}'.format(username, wishability))
+            montage.generateMontage(config)
 
     # Join the seperate wishability images
     magickCmd += '{} -gravity center -append {}_wished.jpg'\

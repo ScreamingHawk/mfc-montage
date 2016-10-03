@@ -7,83 +7,72 @@ generates a pretty montage using ImageMagick with a commandline call.
 
 try:
     # Module import
-    from . import helper
+    from . import helper, image_config
 except SystemError:
     # Local import
-    import helper
+    import helper, image_config
 
 import os
 import concurrent.futures
 
-montage_image_size_w = 256
-montage_image_size_h = 256
-montage_background = 'white'
-montage_strip_bordercolor = 'grey'
 
-montageFlags = None
-montageFlagArgs = None
-
-def resetMontageFlags():
-    global montageFlags
-    global montageFlagArgs
-    montageFlags = '-shadow -geometry "{}x{}+1+1>" -background {}'
-    montageFlagArgs = [montage_image_size_w, montage_image_size_h, \
-                   montage_background]
-
-# Init the flags
-resetMontageFlags()
-
-def preProcessMontage():
+def preProcessMontage(config=image_config.Config()):
     """Resizes all images in image folder. """
-    magickCmd = 'mogrify -resize "{}x{}^" -gravity center '+\
-                '-crop {}x{}+0+0 +repage -bordercolor {} -border 1 *'
-    helper.callMagick(magickCmd.format(montage_image_size_w, \
-                                       montage_image_size_h, \
-                                       montage_image_size_w, \
-                                       montage_image_size_h, \
-                                       montage_strip_bordercolor))    
-        
+    magickCmd = 'mogrify -resize "{}x{}^" -crop {}x{}+0+0 +repage {} *'
+    helper.callMagick(magickCmd.format(config.getImageWidth(), \
+                                       config.getImageHeight(), \
+                                       config.getImageWidth(), \
+                                       config.getImageHeight(), \
+                                       config.generateFlags()))
+    
 
-def generateMontage(username, statusWord, title=True, \
-                    overrideFilename=False, pause=0):
+def generateMontage(config=image_config.Config(), pause=0):
     """Generates a pretty montage with the saved images. """
-    magickCmd = 'montage * '
-    magickCmd += montageFlags.format(*montageFlagArgs)
-    if title:
-        magickCmd += ' -title "{}\'s {}"'.format(username, \
-                                                str(statusWord).title())
-    if not overrideFilename:
-        magickCmd += ' ../{}_{}.jpg'.format(username, statusWord)
-
+    config.setFilenameIfNone('out.jpg')
+    magickCmd = 'montage {} {}'.format(helper.listImageFolderString(), \
+                                       config.generateFlags())
     helper.callMagick(magickCmd, pause=pause)
 
 
-def generateMontageStrip(username, statusWord, title=False, \
-                         overrideFilename=False, pause=0, vertical=True):
+def generateMontageStrip(configStrip=image_config.Config(), \
+                         configMontage=image_config.Config(), \
+                         vertical=False):
     """Generates a strip formatted montage using saved images. """
-    global montage_image_size_w
-    global montage_image_size_h
-    global montageFlags
     if vertical:
-        montage_image_size_w = 300
-        montage_image_size_h = 100
-        resetMontageFlags()
-        montageFlags += ' -tile 1x'
+        configStrip.setImageWidth(300)
+        configStrip.setImageHeight(100)
+        configMontage.setImageWidth(300)
+        configMontage.setImageHeight(100)
+        configMontage.setTile('1x')
     else:
-        montage_image_size_w = 100
-        montage_image_size_h = 300
-        resetMontageFlags()
-        montageFlags += ' -tile x1'
-    preProcessMontage()
-    generateMontage(username, statusWord, title=title, \
-                    overrideFilename=overrideFilename, pause=pause)
+        configStrip.setImageWidth(100)
+        configStrip.setImageHeight(300)
+        configMontage.setImageWidth(100)
+        configMontage.setImageHeight(300)
+        configMontage.setTile('x1')
+    # Default if not set
+    if not configStrip.has_gravity:
+        configStrip.setGravity('center')
+    if not configStrip.has_border:
+        configStrip.setBorderColor('grey')
+    if not configMontage.has_geometry:
+        configMontage.setGeometry("{}x{}+1+1>".format(\
+            configMontage.image_width, configMontage.image_height))
+    if not configMontage.has_background:
+        configMontage.setBackgroundColor('white')
+    if not configMontage.has_shadow is None:
+        configMontage.setHasShadow(True)
+    preProcessMontage(configStrip)
+    generateMontage(configMontage)
 
 
-def generateMontagePantsu(username, statusWord, title=False, \
-                          overrideFilename=False, pause=0):
+def generateMontagePantsu(configStrip=image_config.Config(), \
+                         configMontage=image_config.Config()):
     """Generates a strip formatted montage using saved images, in vertical. """
-    generateMontageStrip(username, statusWord, title, overrideFilename, \
-                         pause, True)
+    generateMontageStrip(configStrip=configStrip, \
+                         configMontage=configMontage, \
+                         vertical=True)
+
 
 def montageStatus(username, status, strip=False, vertical=False):
     """Generates a montage for the given user and status. """
@@ -103,13 +92,14 @@ def montageStatus(username, status, strip=False, vertical=False):
             for item in items:
                 e.submit(helper.saveItemImage(item))
 
+        config = image_config.createUserStatusConfig(username, statusWord)
         if strip:
             if vertical:
-                generateMontagePantsu(username, statusWord)
+                generateMontagePantsu(configMontage=config)
             else:
-                generateMontageStrip(username, statusWord)
+                generateMontageStrip(configMontage=config)
         else:
-            generateMontage(username, statusWord)
+            generateMontage(config)
 
 
 if __name__ == '__main__':
@@ -120,13 +110,15 @@ if __name__ == '__main__':
     strip = str(input('Strip format (y/N): ')).lower() == 'y'
     if strip:
         vert = str(input('Pantsu format (y/N): ')).lower() == 'y'
+    else:
+        vert = False
 
     # Do montage
     if status == '':
         for status in range(0, 3):
             montageStatus(username, status, strip=strip, vertical=vert)
     else:
-        montageStatus(username, status, strip=strip, vertical=vert)
+        montageStatus(username, int(status), strip=strip, vertical=vert)
 
     helper.deleteImageFolder()
 

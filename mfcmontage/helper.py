@@ -24,6 +24,7 @@ def console(out):
     except UnicodeEncodeError:
         print(re.sub(r'([^\s\w]|_)+', '', out))
 
+
 def getResponse(url):
     """A helper method for getting a JSON response. """
     response = urllib.request.urlopen(url)
@@ -61,18 +62,14 @@ def getCollection(username, status, page, items, figuresOnly=True, prepaintedOnl
                        .format(mfc_base, username, status, page))
 
     # Get collection
-    try:
-        coll = resp['collection'][getStatusWord(status)]
+    coll = resp['collection'][getStatusWord(status)]
 
-        for item in coll['item']:
-            if (not figuresOnly or item['root']['name'] == 'Figures') and \
-               (not prepaintedOnly or \
-                item['category']['name'] == 'Prepainted'):
-                items.append(item)
-                console(item['data']['name'])
-    except KeyError:
-        # Nothing in this page
-        return items
+    for item in coll['item']:
+        if (not figuresOnly or item['root']['name'] == 'Figures') and \
+           (not prepaintedOnly or \
+            item['category']['name'] == 'Prepainted'):
+            items.append(item)
+            console(item['data']['name'])
     
     if int(coll['num_pages']) > page:
         return getCollection(username, status, page+1, items)
@@ -95,8 +92,14 @@ def saveItemImage(item):
 
 def listImageFolder():
     """Returns a list of all filenames in the image folder. """
-    return [f for f in os.listdir(imageFolder)]
+    #Note: Ignores files ending in ~ which is a backup/lock file
+    return [f for f in os.listdir(imageFolder) if f[-1] is not '~']
 
+def listImageFolderString():
+    """Returns a string containing a list of all filename in the image
+    folder.
+    """
+    return ' '.join(map('"{}"'.format, listImageFolder()))
 
 def createImageFolder():
     """Creates or empties the image folder. """
