@@ -55,7 +55,8 @@ def getStatusCode(statusWord):
         return -1
 
 
-def getCollection(username, status, page, items, figuresOnly=True, prepaintedOnly=True):
+def getCollection(username, status, page, items, figuresOnly=True, \
+                  prepaintedOnly=False):
     """Returns all items in a users list. """
     console('Getting page: {}'.format(page))
     resp = getResponse('{}&mode=collection&username={}&status={}&page={}'\
